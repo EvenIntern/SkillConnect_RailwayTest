@@ -13,6 +13,18 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.Alpine) {
+                return;
+            }
+
+            const fallbackScript = document.createElement('script');
+            fallbackScript.defer = true;
+            fallbackScript.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js';
+            document.head.appendChild(fallbackScript);
+        });
+    </script>
 
     {{-- This is the new placeholder for page-specific CSS files --}}
     {{ $styles ?? '' }}
