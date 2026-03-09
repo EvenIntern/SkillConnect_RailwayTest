@@ -14,7 +14,11 @@
         @endphp
         <a href="{{ route('messages.show', $conversation) }}" class="block p-4 hover:bg-gray-50 @if(request()->route('conversation') && request()->route('conversation')->id == $conversation->id) bg-blue-50 @endif">
             <div class="flex items-start space-x-3">
-                <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($otherParticipant->name) }}" alt="Avatar">
+                @if ($otherParticipant->avatar_url)
+                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $otherParticipant->avatar_url }}" alt="{{ $otherParticipant->name }}'s avatar">
+                @else
+                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($otherParticipant->name) }}" alt="Avatar">
+                @endif
                 <div class="flex-1 overflow-hidden">
                     <div class="flex justify-between items-center">
                         <h3 class="font-semibold truncate">{{ $otherParticipant->name }}</h3>

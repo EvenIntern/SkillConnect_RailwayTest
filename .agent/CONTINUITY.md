@@ -29,3 +29,11 @@
 2026-03-09T17:54:06+07:00 [USER] Reported that the page started printing part of the `openProjectModal()` JavaScript into the document after the previous modal fix.
 2026-03-09T17:54:06+07:00 [CODE] Corrected the inline `x-data` quoting in `resources/views/layouts/app.blade.php` by switching the injected spinner markup to single-quoted HTML attributes so the body attribute is not terminated early.
 2026-03-09T17:54:06+07:00 [TOOL] Re-verified with `php artisan view:clear` and `php artisan test --filter=MediaAndProjectCreateTest` after the quoting fix.
+2026-03-09T18:06:37+07:00 [USER] Reported that profile pictures were not showing on the discovery page.
+2026-03-09T18:06:37+07:00 [CODE] Updated `resources/views/discovery.blade.php` to render each project owner's `avatar_url` when present and fall back to the generated UI avatar only when no uploaded profile image exists.
+2026-03-09T18:06:37+07:00 [CODE] Added a discovery avatar regression test in `tests/Feature/MediaAndProjectCreateTest.php` covering uploaded avatar rendering on the discover feed.
+2026-03-09T18:06:37+07:00 [TOOL] Targeted verification completed: `php artisan test --filter=MediaAndProjectCreateTest` passed after the discovery avatar fix.
+2026-03-09T18:07:57+07:00 [USER] Requested the same profile-picture fix for the messages pages.
+2026-03-09T18:07:57+07:00 [CODE] Updated `resources/views/messages/_conversation-list.blade.php` and `resources/views/messages/show.blade.php` to use each participant's `avatar_url` with the generated avatar only as a fallback.
+2026-03-09T18:07:57+07:00 [CODE] Extended `tests/Feature/MediaAndProjectCreateTest.php` with coverage for uploaded avatars on both the message list and selected conversation views.
+2026-03-09T18:07:57+07:00 [TOOL] Targeted verification completed: `php artisan test --filter=MediaAndProjectCreateTest` passed after the messages avatar fix.

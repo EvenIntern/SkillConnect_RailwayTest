@@ -18,7 +18,11 @@
     <div class="p-4 border-b flex items-center justify-between">
         @if ($otherParticipant)
             <a href="{{ route('profile.show', $otherParticipant) }}" class="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-lg transition">
-                <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($otherParticipant->name) }}" alt="Avatar">
+                @if ($otherParticipant->avatar_url)
+                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $otherParticipant->avatar_url }}" alt="{{ $otherParticipant->name }}'s avatar">
+                @else
+                    <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($otherParticipant->name) }}" alt="Avatar">
+                @endif
                 <h3 class="font-bold text-lg">{{ $otherParticipant->name }}</h3>
             </a>
         @endif

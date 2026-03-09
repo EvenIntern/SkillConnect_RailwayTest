@@ -116,7 +116,11 @@
                             <div class="p-5">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0">
-                                        <img class="h-12 w-12 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($project->user->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $project->user->name }}'s avatar">
+                                        @if ($project->user->avatar_url)
+                                            <img class="h-12 w-12 rounded-full object-cover" src="{{ $project->user->avatar_url }}" alt="{{ $project->user->name }}'s avatar">
+                                        @else
+                                            <img class="h-12 w-12 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($project->user->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $project->user->name }}'s avatar">
+                                        @endif
                                     </div>
                                     <div class="ml-4 flex-1">
                                         <div class="flex items-center">
