@@ -26,3 +26,6 @@
 2026-03-09T17:35:55+07:00 [USER] Reported that clicking project comments opens a broken modal state with the loading overlay and duplicated page shell instead of the project detail partial.
 2026-03-09T17:35:55+07:00 [CODE] Updated `resources/views/layouts/app.blade.php` so `openProjectModal()` sends the AJAX header Laravel expects, resets the spinner before each load, and falls back to the full project page if the fetch fails.
 2026-03-09T17:35:55+07:00 [TOOL] Targeted verification completed: `php artisan test --filter=MediaAndProjectCreateTest` passed after the modal fetch fix.
+2026-03-09T17:54:06+07:00 [USER] Reported that the page started printing part of the `openProjectModal()` JavaScript into the document after the previous modal fix.
+2026-03-09T17:54:06+07:00 [CODE] Corrected the inline `x-data` quoting in `resources/views/layouts/app.blade.php` by switching the injected spinner markup to single-quoted HTML attributes so the body attribute is not terminated early.
+2026-03-09T17:54:06+07:00 [TOOL] Re-verified with `php artisan view:clear` and `php artisan test --filter=MediaAndProjectCreateTest` after the quoting fix.

@@ -60,8 +60,8 @@
     async openProjectModal(projectId) {
         let url = `/projects/${projectId}`;
         this.$refs.projectModalContent.innerHTML = `
-            <div class="flex items-center justify-center min-h-[400px]">
-                <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+            <div class='flex items-center justify-center min-h-[400px]'>
+                <i class='fas fa-spinner fa-spin text-4xl text-gray-400'></i>
             </div>
         `;
 
