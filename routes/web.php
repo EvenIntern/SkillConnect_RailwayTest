@@ -10,6 +10,7 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\MediaController;
 
 
 
@@ -22,9 +23,9 @@ Route::get('/', LandingPageController::class)->name('welcome');
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/discover', [App\Http\Controllers\ProjectController::class, 'index'])->name('discover');
+Route::get('/media/{path}', [MediaController::class, 'show'])->where('path', '.*')->name('media.show');
 
 Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
-Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
@@ -47,4 +48,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
     Route::post('/projects/{project}/like', [ProjectController::class, 'toggleLike'])->name('projects.toggleLike');
 });
+
+Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
 require __DIR__.'/auth.php';

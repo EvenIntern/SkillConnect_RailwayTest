@@ -97,9 +97,13 @@ class ProjectController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('projects.create');
+        if ($request->ajax()) {
+            return view('projects.create');
+        }
+
+        return view('projects.create-page');
     }
 
     /**

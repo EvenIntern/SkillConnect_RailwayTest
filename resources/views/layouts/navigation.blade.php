@@ -23,15 +23,15 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">
-                 <button @click.prevent="openCreatePostModal()" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-full font-medium transition duration-300 text-sm mr-4">
+                 <a href="{{ route('projects.create') }}" @click.prevent="openCreatePostModal()" class="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-full font-medium transition duration-300 text-sm mr-4 inline-flex items-center">
                     <i class="fas fa-plus mr-1"></i> New Post
-                </button>
+                </a>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         {{-- MODIFIED: Added user avatar to the dropdown button --}}
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                             @if (Auth::user()->avatar_path)
-                                <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ Storage::url(Auth::user()->avatar_path) }}" alt="{{ Auth::user()->name }}'s avatar">
+                                <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}'s avatar">
                             @else
                                 <img class="h-8 w-8 rounded-full mr-2" src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}" alt="{{ Auth::user()->name }}'s avatar">
                             @endif

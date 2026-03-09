@@ -59,8 +59,8 @@
                         <div class="px-4 pb-6 relative">
                             <div class="flex justify-center">
                                 <div class="rounded-full -mt-12 border-4 border-white overflow-hidden">
-                                    @if (auth()->user()->avatar_path)
-                                        <img class="h-24 w-24 rounded-full object-cover avatar-ring" src="{{ Storage::url(auth()->user()->avatar_path) }}" alt="{{ auth()->user()->name }}'s avatar">
+                                    @if (auth()->user()->avatar_url)
+                                        <img class="h-24 w-24 rounded-full object-cover avatar-ring" src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}'s avatar">
                                     @else
                                         <img class="h-24 w-24 rounded-full avatar-ring" src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&size=256&background=EBF4FF&color=7F9CF5" alt="{{ auth()->user()->name }}'s avatar">
                                     @endif
@@ -188,8 +188,8 @@
                         {{-- Card Header --}}
                         <div class="flex items-start">
                                 <a href="{{ route('profile.show', $project->user) }}" @click.stop>
-                                    @if ($project->user->avatar_path)
-                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($project->user->avatar_path) }}" alt="{{ $project->user->name }}'s avatar">
+                                    @if ($project->user->avatar_url)
+                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ $project->user->avatar_url }}" alt="{{ $project->user->name }}'s avatar">
                                     @else
                                         <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($project->user->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $project->user->name }}'s avatar">
                                     @endif
@@ -317,8 +317,8 @@
                     @forelse ($recommendedUsers as $recommendedUser)
                         <div class="flex items-center">
                             <a href="{{ route('profile.show', $recommendedUser) }}">
-                                @if ($recommendedUser->avatar_path)
-                                   <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($recommendedUser->avatar_path) }}" alt="{{ $recommendedUser->name }}'s avatar">
+                                @if ($recommendedUser->avatar_url)
+                                   <img class="h-10 w-10 rounded-full object-cover" src="{{ $recommendedUser->avatar_url }}" alt="{{ $recommendedUser->name }}'s avatar">
                                 @else
                                       <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($recommendedUser->name) }}&size=256&background=EBF4FF&color=7F9CF5" alt="{{ $recommendedUser->name }}'s avatar">
                                  @endif

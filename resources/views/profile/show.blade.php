@@ -10,8 +10,8 @@
         {{-- Profile Header Card --}}
         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div>
-                @if ($user->banner_path)
-                    <img class="h-48 w-full object-cover" src="{{ Storage::url($user->banner_path) }}" alt="Profile banner">
+                @if ($user->banner_url)
+                    <img class="h-48 w-full object-cover" src="{{ $user->banner_url }}" alt="Profile banner">
                 @else
                     <img class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1504805572947-34fad45aed93?q=80&w=2070&auto=format&fit=crop" alt="Profile background">
                 @endif
@@ -19,8 +19,8 @@
             <div class="p-6">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                     <div class="flex items-start">    
-                        @if ($user->avatar_path)
-                        <img class="h-28 w-28 rounded-full border-4 border-white -mt-20" src="{{ Storage::url($user->avatar_path) }}" alt="{{ $user->name }}'s avatar">
+                        @if ($user->avatar_url)
+                        <img class="h-28 w-28 rounded-full border-4 border-white -mt-20" src="{{ $user->avatar_url }}" alt="{{ $user->name }}'s avatar">
                     @else
                         <img class="h-28 w-28 rounded-full border-4 border-white -mt-20" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=256&background=EBF4FF&color=7F9CF5" alt="{{ $user->name }}'s avatar">
                     @endif
@@ -182,8 +182,8 @@
                                     <div class="flex items-start">
                                         <a href="{{ route('profile.show', $project->user) }}">
                                             <a href="{{ route('profile.show', $project->user) }}" @click.stop>
-                                                @if ($project->user->avatar_path)
-                                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($project->user->avatar_path) }}" alt="{{ $project->user->name }}'s avatar">
+                                                @if ($project->user->avatar_url)
+                                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $project->user->avatar_url }}" alt="{{ $project->user->name }}'s avatar">
                                                 @else
                                                     <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($project->user->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $project->user->name }}'s avatar">
                                                 @endif
@@ -239,8 +239,8 @@
                     {{-- Card Header: Creator's avatar, name, and post time --}}
                     <div class="flex items-start">
                         <a href="{{ route('profile.show', $user) }}" @click.stop>
-                            @if ($user->avatar_path)
-                                <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($user->avatar_path) }}" alt="{{ $user->name }}'s avatar">
+                            @if ($user->avatar_url)
+                                <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->avatar_url }}" alt="{{ $user->name }}'s avatar">
                             @else
                                 <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $user->name }}'s avatar">
                             @endif

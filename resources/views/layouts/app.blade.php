@@ -33,9 +33,23 @@
 <body x-data="{ 
     openModal: null,
     async openCreatePostModal() {
-        let response = await fetch('{{ route('projects.create') }}');
-        this.$refs.createPostModalContent.innerHTML = await response.text();
-        this.openModal = 'createProject';
+        try {
+            const response = await fetch('{{ route('projects.create') }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (!response.ok) {
+                window.location.href = '{{ route('projects.create') }}';
+                return;
+            }
+
+            this.$refs.createPostModalContent.innerHTML = await response.text();
+            this.openModal = 'createProject';
+        } catch (error) {
+            window.location.href = '{{ route('projects.create') }}';
+        }
     },
 
     async openProjectModal(projectId) {

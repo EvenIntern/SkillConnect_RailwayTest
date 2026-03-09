@@ -83,8 +83,8 @@
         <form action="{{ route('comments.store', $project) }}" method="POST" class="mb-6">
             @csrf
             <div class="flex items-start space-x-3">
-                @if (auth()->user()->avatar_path)
-                    <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url(auth()->user()->avatar_path) }}" alt="Your avatar">
+                @if (auth()->user()->avatar_url)
+                    <img class="h-10 w-10 rounded-full object-cover" src="{{ auth()->user()->avatar_url }}" alt="Your avatar">
                 @else
                     <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&size=256&background=EBF4FF&color=7F9CF5" alt="Your avatar">
                 @endif
@@ -102,8 +102,8 @@
             @forelse ($project->comments as $comment)
                 <div class="flex items-start space-x-3">
                     <a href="{{ route('profile.show', $comment->user) }}">
-                        @if ($comment->user->avatar_path)
-                            <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($comment->user->avatar_path) }}" alt="{{ $comment->user->name }}'s avatar">
+                        @if ($comment->user->avatar_url)
+                            <img class="h-10 w-10 rounded-full object-cover" src="{{ $comment->user->avatar_url }}" alt="{{ $comment->user->name }}'s avatar">
                         @else
                             <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($comment->user->name) }}&size=256&background=EBF4FF&color=7F9CF5" alt="Commenter's avatar">
                         @endif
