@@ -19,3 +19,7 @@
 2026-03-09T16:36:00+07:00 [CODE] Refreshed auth/dashboard presentation in `resources/views/layouts/guest.blade.php`, `resources/views/auth/*.blade.php`, and `resources/views/home.blade.php` with self-contained branded styling.
 2026-03-09T16:40:00+07:00 [CODE] Added `tests/Feature/SearchFilterTest.php` to cover lowercase search queries matching mixed-case project titles.
 2026-03-09T16:41:00+07:00 [TOOL] Full local verification completed: `php artisan test` passed with 38 tests and 131 assertions after the search and styling changes.
+2026-03-09T16:55:00+07:00 [USER] Reported that posting a project comment causes a full page refresh that strips CSS/styling.
+2026-03-09T17:02:00+07:00 [CODE] Fixed project detail rendering split: `ProjectController::show()` now returns the modal partial only for AJAX requests and a new `projects/show-page.blade.php` wrapper for normal page loads.
+2026-03-09T17:05:00+07:00 [CODE] Added regression coverage in `tests/Feature/MediaAndProjectCreateTest.php` for both full-page and AJAX project detail rendering.
+2026-03-09T17:06:00+07:00 [TOOL] Full local verification completed: `php artisan test` passed with 40 tests and 137 assertions after the project detail fallback fix.
