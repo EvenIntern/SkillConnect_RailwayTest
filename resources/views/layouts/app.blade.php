@@ -59,9 +59,30 @@
 
     async openProjectModal(projectId) {
         let url = `/projects/${projectId}`;
-        let response = await fetch(url);
-        this.$refs.projectModalContent.innerHTML = await response.text();
-        this.openModal = 'projectDetails';
+        this.$refs.projectModalContent.innerHTML = `
+            <div class="flex items-center justify-center min-h-[400px]">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+            </div>
+        `;
+
+        try {
+            let response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html',
+                },
+            });
+
+            if (!response.ok) {
+                window.location.href = url;
+                return;
+            }
+
+            this.$refs.projectModalContent.innerHTML = await response.text();
+            this.openModal = 'projectDetails';
+        } catch (error) {
+            window.location.href = url;
+        }
     }
 
 }" class="font-sans antialiased">

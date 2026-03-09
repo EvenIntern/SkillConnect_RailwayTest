@@ -23,3 +23,6 @@
 2026-03-09T17:02:00+07:00 [CODE] Fixed project detail rendering split: `ProjectController::show()` now returns the modal partial only for AJAX requests and a new `projects/show-page.blade.php` wrapper for normal page loads.
 2026-03-09T17:05:00+07:00 [CODE] Added regression coverage in `tests/Feature/MediaAndProjectCreateTest.php` for both full-page and AJAX project detail rendering.
 2026-03-09T17:06:00+07:00 [TOOL] Full local verification completed: `php artisan test` passed with 40 tests and 137 assertions after the project detail fallback fix.
+2026-03-09T17:35:55+07:00 [USER] Reported that clicking project comments opens a broken modal state with the loading overlay and duplicated page shell instead of the project detail partial.
+2026-03-09T17:35:55+07:00 [CODE] Updated `resources/views/layouts/app.blade.php` so `openProjectModal()` sends the AJAX header Laravel expects, resets the spinner before each load, and falls back to the full project page if the fetch fails.
+2026-03-09T17:35:55+07:00 [TOOL] Targeted verification completed: `php artisan test --filter=MediaAndProjectCreateTest` passed after the modal fetch fix.
