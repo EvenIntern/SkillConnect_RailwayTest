@@ -1,9 +1,14 @@
 <x-guest-layout>
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-
     <form method="POST" action="{{ route('login') }}">
         @csrf
+
+        <div class="mb-6">
+            <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-blue-700">Sign In</span>
+            <h1 class="text-2xl font-bold text-gray-900">Welcome Back</h1>
+            <p class="mt-2 text-sm text-gray-600">Sign in to manage projects, applications, and conversations.</p>
+        </div>
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
@@ -27,23 +32,22 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="flex items-center justify-between mt-6">
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3 !rounded-full !bg-blue-600 !px-5 !py-3 !text-sm normal-case tracking-normal hover:!bg-blue-700 focus:!bg-blue-700">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
 
-        {{-- This is the new link to the Register page --}}
-        <div class="text-center mt-6 pt-4 border-t">
+        <div class="mt-6 rounded-2xl bg-slate-50 px-4 py-4 text-center">
             <p class="text-sm text-gray-600">
                 {{ __("Don't have an account?") }}
-                <a class="underline text-sm text-blue-600 hover:text-blue-800" href="{{ route('register') }}">
+                <a class="font-semibold text-blue-600 hover:text-blue-800" href="{{ route('register') }}">
                     {{ __('Register') }}
                 </a>
             </p>

@@ -2,6 +2,12 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+        <div class="mb-6">
+            <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Create Account</span>
+            <h1 class="text-2xl font-bold text-gray-900">Create Your Account</h1>
+            <p class="mt-2 text-sm text-gray-600">Join SkillConnect to post needs, volunteer, and build your portfolio.</p>
+        </div>
+
         {{-- First Name --}}
         <div>
             <x-input-label for="first_name" :value="__('First Name')" />
@@ -46,12 +52,12 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+        <div class="mt-6 flex items-center justify-between gap-3">
+            <a class="text-sm font-medium text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 
-            <x-primary-button class="ms-4">
+            <x-primary-button class="ms-4 !rounded-full !bg-emerald-600 !px-5 !py-3 !text-sm normal-case tracking-normal hover:!bg-emerald-700 focus:!bg-emerald-700">
                 {{ __('Register') }}
             </x-primary-button>
         </div>

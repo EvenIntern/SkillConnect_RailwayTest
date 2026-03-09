@@ -4,17 +4,18 @@
      {{ __('SkillConnect - Home') }}
     </x-slot>
     {{-- Hero Section --}}
-    <div class="gradient-bg text-white py-12">
+    <div class="gradient-bg text-white py-12" style="background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 30%), radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.24), transparent 25%), linear-gradient(135deg, #1d4ed8, #0f766e);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center">
                 <div class="md:w-1/2 mb-8 md:mb-0">
+                    <span class="inline-flex items-center rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-blue-100 backdrop-blur">Volunteer Dashboard</span>
                     <h1 class="text-4xl md:text-5xl font-bold mb-4">Make a Difference Together</h1>
                     <p class="text-xl mb-6">Connect with local volunteer opportunities and create meaningful change in your community.</p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{{ route('discover') }}" class="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 rounded-full font-medium transition duration-300">
+                        <a href="{{ route('discover') }}" class="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-full font-medium transition duration-300 shadow-lg shadow-slate-900/10">
                             Find Opportunities
                         </a>
-                        <button @click.prevent="openCreatePostModal()" class="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-full font-medium transition duration-300">
+                        <button @click.prevent="openCreatePostModal()" class="border border-white/25 bg-slate-900/20 hover:bg-slate-900/30 text-white px-6 py-3 rounded-full font-medium transition duration-300 backdrop-blur">
                             Post a Need
                         </button>
                     </div>

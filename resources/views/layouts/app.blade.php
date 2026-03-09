@@ -13,6 +13,11 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .gradient-bg {
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Alpine) {

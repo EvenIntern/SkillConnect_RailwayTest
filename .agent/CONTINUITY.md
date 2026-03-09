@@ -14,3 +14,8 @@
 2026-03-09T15:58:00+07:00 [CODE] Implemented lightweight live polling instead of websockets: added project stats endpoint, dashboard live endpoint, discovery live endpoint, dashboard/discovery partials, and frontend polling for feed metrics and sidebar sections.
 2026-03-09T16:00:00+07:00 [CODE] Added endpoint coverage in `tests/Feature/LiveUpdateEndpointTest.php` for project stats, dashboard live panels, and discovery saved-project refresh.
 2026-03-09T16:02:00+07:00 [TOOL] Full local verification completed: `php artisan test` passed with 37 tests and 128 assertions after the live-update implementation.
+2026-03-09T16:25:00+07:00 [USER] Requested case-insensitive project title search plus more consistent login/register and dashboard hero styling.
+2026-03-09T16:34:00+07:00 [CODE] Updated `App\Models\Project::scopeFilter()` to use a database-aware case-insensitive search operator and added guest-safe navigation fallbacks for public discovery access.
+2026-03-09T16:36:00+07:00 [CODE] Refreshed auth/dashboard presentation in `resources/views/layouts/guest.blade.php`, `resources/views/auth/*.blade.php`, and `resources/views/home.blade.php` with self-contained branded styling.
+2026-03-09T16:40:00+07:00 [CODE] Added `tests/Feature/SearchFilterTest.php` to cover lowercase search queries matching mixed-case project titles.
+2026-03-09T16:41:00+07:00 [TOOL] Full local verification completed: `php artisan test` passed with 38 tests and 131 assertions after the search and styling changes.

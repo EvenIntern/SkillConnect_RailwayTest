@@ -45,11 +45,13 @@ class Project extends Model
 
     public function scopeFilter(Builder $query, array $filters): void
     {
+        $searchOperator = self::searchOperator();
+
         // Filter by text search (title or description)
-        $query->when($filters['search'] ?? false, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+        $query->when($filters['search'] ?? false, function ($query, $search) use ($searchOperator) {
+            $query->where(function ($query) use ($search, $searchOperator) {
+                $query->where('title', $searchOperator, '%' . $search . '%')
+                    ->orWhere('description', $searchOperator, '%' . $search . '%');
             });
         });
 
@@ -59,8 +61,8 @@ class Project extends Model
         });
 
         // Filter by skills (simple text search)
-        $query->when($filters['skills'] ?? false, function ($query, $skill) {
-            $query->where('skills_required', 'like', '%' . $skill . '%');
+        $query->when($filters['skills'] ?? false, function ($query, $skill) use ($searchOperator) {
+            $query->where('skills_required', $searchOperator, '%' . $skill . '%');
         });
 
         // Filter by Location Type (In-person vs. Virtual)
@@ -71,6 +73,14 @@ class Project extends Model
                 $query->where('is_remote', false);
             }
         });
+    }
+
+    private static function searchOperator(): string
+    {
+        $defaultConnection = config('database.default');
+        $driver = config("database.connections.{$defaultConnection}.driver");
+
+        return $driver === 'pgsql' ? 'ilike' : 'like';
     }
 
 
