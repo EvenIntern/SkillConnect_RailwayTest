@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
@@ -80,7 +81,7 @@ class ProjectController extends Controller
         ]);
     }
 
-        public function toggleLike(Request $request, Project $project)
+    public function toggleLike(Request $request, Project $project)
     {
         $user = Auth::user();
         $user->likedProjects()->toggle($project);
@@ -91,6 +92,56 @@ class ProjectController extends Controller
         return response()->json([
             'success' => true,
             'likes_count' => $likesCount,
+        ]);
+    }
+
+    public function stats(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'project_ids' => ['required', 'array', 'max:25'],
+            'project_ids.*' => ['integer', 'distinct'],
+        ]);
+
+        $projectIds = collect($validated['project_ids'])->map(fn ($id) => (int) $id)->all();
+        $projects = Project::withCount(['comments', 'likers'])
+            ->whereIn('id', $projectIds)
+            ->get()
+            ->keyBy('id');
+
+        $user = $request->user();
+        $appliedIds = $user->applications()->whereIn('project_id', $projectIds)->pluck('project_id')->all();
+        $savedIds = $user->savedProjects()->whereIn('projects.id', $projectIds)->pluck('projects.id')->all();
+
+        $payload = [];
+
+        foreach ($projects as $project) {
+            $payload[$project->id] = [
+                'likes_count' => $project->likers_count,
+                'comments_count' => $project->comments_count,
+                'has_applied' => in_array($project->id, $appliedIds, true),
+                'is_saved' => in_array($project->id, $savedIds, true),
+                'is_owner' => $project->user_id === $user->id,
+            ];
+        }
+
+        return response()->json([
+            'projects' => $payload,
+        ]);
+    }
+
+    public function discoveryLive(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $savedProjectsForSidebar = $user->savedProjects()
+            ->with('user')
+            ->latest('project_saves.created_at')
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'saved_projects_html' => view('discovery.partials.saved-projects', [
+                'savedProjectsForSidebar' => $savedProjectsForSidebar,
+            ])->render(),
         ]);
     }
 
@@ -175,12 +226,14 @@ class ProjectController extends Controller
     {
         // 1. Prevent users from applying to their own project (Important!)
         if ($project->user_id === auth()->id()) {
-            return back()->with('error', 'You cannot apply to your own project.');
+            return $this->safeRedirectBack(route('dashboard'))
+                ->with('error', 'You cannot apply to your own project.');
         }
 
         // 2.A clean check using the relationship and exists()
         if ($project->applications()->where('user_id', auth()->id())->exists()) {
-            return back()->with('info', 'You have already applied for this project.');
+            return $this->safeRedirectBack(route('dashboard'))
+                ->with('info', 'You have already applied for this project.');
         }
 
         
@@ -188,7 +241,8 @@ class ProjectController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Your application has been submitted!');
+        return $this->safeRedirectBack(route('dashboard'))
+            ->with('success', 'Your application has been submitted!');
     }
 
 
@@ -211,6 +265,18 @@ class ProjectController extends Controller
             'success' => true,
             'is_saved' => $isSaved
         ]);
+    }
+
+    private function safeRedirectBack(string $fallback): RedirectResponse
+    {
+        $previous = url()->previous();
+        $previousPath = $previous ? parse_url($previous, PHP_URL_PATH) : null;
+
+        if (! $previousPath || str_starts_with($previousPath, '/media/')) {
+            return redirect()->to($fallback);
+        }
+
+        return redirect()->to($previous);
     }
 
 }

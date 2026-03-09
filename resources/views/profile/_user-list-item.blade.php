@@ -2,7 +2,11 @@
 <div class="flex items-center justify-between">
     <div class="flex items-center space-x-3">
         <a href="{{ route('profile.show', $userToList) }}">
-            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($userToList->name) }}" alt="Avatar">
+            @if ($userToList->avatar_url)
+                <img class="h-10 w-10 rounded-full object-cover" src="{{ $userToList->avatar_url }}" alt="{{ $userToList->name }}'s avatar">
+            @else
+                <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($userToList->name) }}" alt="Avatar">
+            @endif
         </a>
         <div>
             <a href="{{ route('profile.show', $userToList) }}" class="font-semibold text-sm hover:underline">{{ $userToList->name }}</a>

@@ -28,6 +28,9 @@ Route::get('/media/{path}', [MediaController::class, 'show'])->where('path', '.*
 Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard/live', [DashboardController::class, 'live'])->name('dashboard.live');
+    Route::post('/projects/stats', [ProjectController::class, 'stats'])->name('projects.stats');
+    Route::get('/discover/live', [ProjectController::class, 'discoveryLive'])->name('discover.live');
     Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::post('/projects/{project}/save', [ProjectController::class, 'toggleSave'])->name('projects.toggleSave');

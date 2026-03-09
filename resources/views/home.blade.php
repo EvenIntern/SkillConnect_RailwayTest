@@ -269,28 +269,35 @@
                         </button>
 
                         {{-- Dynamic Comment Count (already correct) --}}
-                        <a href="#" @click.prevent="openProjectModal({{ $project->id }})" class="flex items-center text-gray-500 hover:text-green-500">
+                        <a href="#" @click.prevent="openProjectModal({{ $project->id }})" class="flex items-center text-gray-500 hover:text-green-500" data-project-id="{{ $project->id }}">
                             <i class="far fa-comment mr-1"></i>
-                            <span>{{ $project->comments_count }}</span>
+                            <span class="comment-count">{{ $project->comments_count }}</span>
                         </a>
                     </div>
 
                     @php
                         $hasApplied = $project->applications->contains('user_id', auth()->id());
+                        $isOwner = auth()->check() && $project->user_id === auth()->id();
                     @endphp
 
-                    @if($hasApplied)
-                        <button @click.stop class="px-4 py-1 bg-gray-400 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>
-                            <i class="fas fa-check mr-1"></i> Applied
-                        </button>
-                    @else
-                        <form @click.stop action="{{ route('projects.apply', $project) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium hover:bg-blue-600 transition">
-                                <i class="fas fa-hand-holding-heart mr-1"></i> Volunteer
+                    <div class="project-apply-state" data-project-id="{{ $project->id }}">
+                        @if($isOwner)
+                            <button @click.stop class="px-4 py-1 bg-gray-300 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>
+                                Manage Your Project
                             </button>
-                        </form>
-                    @endif
+                        @elseif($hasApplied)
+                            <button @click.stop class="px-4 py-1 bg-gray-400 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>
+                                <i class="fas fa-check mr-1"></i> Applied
+                            </button>
+                        @else
+                            <form @click.stop action="{{ route('projects.apply', $project) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium hover:bg-blue-600 transition">
+                                    <i class="fas fa-hand-holding-heart mr-1"></i> Volunteer
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
                 </div>
 
@@ -344,108 +351,17 @@
 
 
             {{-- "Incoming Applicants" Section --}}
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Incoming Applicants</h3>
-                <div class="space-y-6">
-                    {{-- This outer loop for each project remains the same --}}
-                    @forelse ($incomingApplicants as $projectTitle => $applications)
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <h4 class="font-bold text-gray-900 mb-3">{{ $projectTitle }}</h4>
-
-                            <div class="space-y-4">
-                                {{-- Loop through the applicants for THIS project --}}
-                                @foreach ($applications as $application)
-                                    <div class="py-3 border-b border-gray-200 last:border-b-0">
-                                        {{-- Row 1: Name and Time --}}
-                                        <div class="flex items-baseline justify-between">
-                                            <a href="{{ route('profile.show', $application->user) }}" class="font-semibold text-blue-700 hover:underline">
-                                                {{ $application->user->name }}
-                                            </a>
-                                            <p class="text-xs text-gray-500">
-                                            {{ $application->created_at->diffForHumans() }}
-                                            </p>
-                                        </div>
-
-
-                                        <div class="mt-2">
-                                            <form action="{{ route('applications.update', $application->id) }}" method="POST" class="flex gap-2">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button name="status" value="accepted" class="font-semibold text-xs px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">Accept</button>
-                                                <button name="status" value="declined" class="font-semibold text-xs px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition">Decline</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-4">
-                            <p class="text-sm text-gray-500">When someone applies to your projects, you'll see them here.</p>
-                        </div>
-                    @endforelse
-                </div>
+            <div id="incoming-applicants-panel">
+                @include('home.partials.incoming-applicants', ['incomingApplicants' => $incomingApplicants])
             </div>
 
 
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Accepted Projects</h3>
-                    <div class="space-y-4">
-                        @forelse ($acceptedProjects as $project)
-                            <div class="bg-green-50 border border-green-200 rounded-lg shadow-sm p-4">
-                                <h4 class="font-bold text-green-800">{{ $project->title }}</h4>
-                                <p class="text-xs text-gray-600 mt-1">
-                                    Posted by
-                                    
-                                    <a href="{{ route('profile.show', $project->user) }}" class="font-medium text-gray-900 hover:underline">
-                                        
-                                        {{ $project->organization_name ?? $project->user->name }}
-                                    </a>
-                                </p>
-                                <p class="text-sm text-gray-700 mt-1">{{ Str::limit($project->description, 100) }}</p>
-                                <p class="text-xs text-gray-500 mt-2">You were accepted {{ $project->pivot->updated_at->diffForHumans() }}</p>
-                            </div>
-                        @empty
-                            {{-- This block will be displayed if the $acceptedProjects collection is empty --}}
-                            <div class="text-center py-4">
-                                <p class="text-sm text-gray-500">You haven't been accepted to any projects yet.</p>
-                                <a href="{{ route('discover') }}" class="mt-2 inline-block text-sm text-blue-600 hover:underline font-semibold">
-                                    Find opportunities to apply for!
-                                </a>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
+            <div id="accepted-projects-panel">
+                @include('home.partials.accepted-projects', ['acceptedProjects' => $acceptedProjects])
             </div>
 
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Pending Projects</h3>
-                    <div class="space-y-4">
-                        @forelse ($pendingProjects as $project)
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm p-4">
-                                <h4 class="font-bold text-yellow-800">{{ $project->title }}</h4>
-                                <p class="text-xs text-gray-600 mt-1">
-                                    Posted by
-                                    <a href="{{ route('profile.show', $project->user) }}" class="font-medium text-gray-900 hover:underline">
-                                        {{ $project->organization_name ?? $project->user->name }}
-                                    </a>
-                                </p>
-                                <p class="text-sm text-gray-700 mt-1">{{ Str::limit($project->description, 300) }}</p>
-                                <p class="text-xs text-gray-500 mt-2">You applied {{ $project->pivot->updated_at->diffForHumans() }}</p>
-                            </div>
-                        @empty
-                            {{-- This block will be displayed if the $acceptedProjects collection is empty --}}
-                            <div class="text-center py-4">
-                                <p class="text-sm text-gray-500">Your pending project applications will show up here!</p>
-                                <a href="{{ route('discover') }}" class="mt-2 inline-block text-sm text-blue-600 hover:underline font-semibold">
-                                    Find opportunities to apply for!
-                                </a>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
+            <div id="pending-projects-panel">
+                @include('home.partials.pending-projects', ['pendingProjects' => $pendingProjects])
             </div>
 
             </div>
@@ -456,6 +372,80 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const projectIds = Array.from(document.querySelectorAll('.like-btn')).map(button => button.dataset.projectId);
+
+    function renderApplyState(projectId, projectState) {
+        const container = document.querySelector(`.project-apply-state[data-project-id="${projectId}"]`);
+
+        if (!container) {
+            return;
+        }
+
+        if (projectState.is_owner) {
+            container.innerHTML = '<button class="px-4 py-1 bg-gray-300 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>Manage Your Project</button>';
+            return;
+        }
+
+        if (projectState.has_applied) {
+            container.innerHTML = '<button class="px-4 py-1 bg-gray-400 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled><i class="fas fa-check mr-1"></i> Applied</button>';
+        }
+    }
+
+    async function refreshProjectStats() {
+        if (projectIds.length === 0) {
+            return;
+        }
+
+        const response = await fetch('{{ route('projects.stats') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ project_ids: projectIds })
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+
+        Object.entries(data.projects).forEach(([projectId, projectState]) => {
+            const likeButton = document.querySelector(`.like-btn[data-project-id="${projectId}"]`);
+            if (likeButton) {
+                const likeCount = likeButton.querySelector('.like-count');
+                if (likeCount) {
+                    likeCount.textContent = projectState.likes_count;
+                }
+            }
+
+            const commentLink = document.querySelector(`a[data-project-id="${projectId}"] .comment-count`);
+            if (commentLink) {
+                commentLink.textContent = projectState.comments_count;
+            }
+
+            renderApplyState(projectId, projectState);
+        });
+    }
+
+    async function refreshDashboardPanels() {
+        const response = await fetch('{{ route('dashboard.live') }}', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        document.getElementById('incoming-applicants-panel').innerHTML = data.incoming_applicants_html;
+        document.getElementById('accepted-projects-panel').innerHTML = data.accepted_projects_html;
+        document.getElementById('pending-projects-panel').innerHTML = data.pending_projects_html;
+    }
 
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', async function (event) {
@@ -486,6 +476,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    const pollLiveData = async () => {
+        try {
+            await Promise.all([
+                refreshProjectStats(),
+                refreshDashboardPanels(),
+            ]);
+        } catch (error) {
+            console.error('Live dashboard refresh failed.', error);
+        }
+    };
+
+    setInterval(pollLiveData, 15000);
 });
 </script>
 @endpush

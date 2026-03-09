@@ -112,7 +112,7 @@
                 
                 <div class="space-y-4">
                     @forelse ($projects as $project)
-                        <div class="bg-white rounded-lg shadow overflow-hidden opportunity-card">
+                        <div class="bg-white rounded-lg shadow overflow-hidden opportunity-card" data-project-id="{{ $project->id }}">
                             <div class="p-5">
                                 <div class="flex items-start">
                                     <div class="flex-shrink-0">
@@ -209,20 +209,27 @@
                                     </button>
                                     @php
                                         $hasApplied = $project->applications->contains('user_id', auth()->id());
+                                        $isOwner = auth()->check() && $project->user_id === auth()->id();
                                     @endphp
 
-                                    @if($hasApplied)
-                                        <button class="px-4 py-1 bg-gray-400 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>
-                                            <i class="fas fa-check mr-1"></i> Applied
-                                        </button>
-                                    @else
-                                    <form action="{{ route('projects.apply', $project) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium hover:bg-blue-600 transition">
-                                            <i class="fas fa-hand-holding-heart mr-1"></i> Volunteer
-                                        </button>
-                                    </form>
-                                    @endif
+                                    <div class="project-apply-state" data-project-id="{{ $project->id }}">
+                                        @if($isOwner)
+                                            <button class="px-4 py-1 bg-gray-300 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>
+                                                Manage Your Project
+                                            </button>
+                                        @elseif($hasApplied)
+                                            <button class="px-4 py-1 bg-gray-400 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>
+                                                <i class="fas fa-check mr-1"></i> Applied
+                                            </button>
+                                        @else
+                                        <form action="{{ route('projects.apply', $project) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium hover:bg-blue-600 transition">
+                                                <i class="fas fa-hand-holding-heart mr-1"></i> Volunteer
+                                            </button>
+                                        </form>
+                                        @endif
+                                    </div>
 
                                     <a href="{{ route('messages.start', ['user' => $project->user->id]) }}" class="px-4 py-1 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700">
                                         <i class="fas fa-comments mr-1"></i> Chat
@@ -324,74 +331,8 @@
             {{-- Saved Projects Card --}}
             <div class="bg-white rounded-lg shadow p-4">
                 <h3 class="font-xl font-semibold text-gray-900 mb-3">Saved Projects</h3>
-                <div>
-                    @forelse ($savedProjectsForSidebar as $savedProject)
-                        {{-- NEW: Logic to determine icon style based on project status --}}
-                        @php
-                            $icon = 'fa-calendar-day';
-                            $bgColor = 'bg-gray-100';
-                            $iconColor = 'text-gray-500';
-
-                            switch ($savedProject->status) {
-                                case 'Urgent':
-                                    $icon = 'fa-circle-exclamation';
-                                    $bgColor = 'bg-red-100';
-                                    $iconColor = 'text-red-500';
-                                    break;
-                                case 'Environmental':
-                                    $icon = 'fa-tree';
-                                    $bgColor = 'bg-green-100';
-                                    $iconColor = 'text-green-500';
-                                    break;
-                                case 'Education':
-                                    $icon = 'fa-graduation-cap';
-                                    $bgColor = 'bg-blue-100';
-                                    $iconColor = 'text-blue-500';
-                                    break;
-                                case 'Community':
-                                    $icon = 'fa-users';
-                                    $bgColor = 'bg-yellow-100';
-                                    $iconColor = 'text-yellow-500';
-                                    break;
-                                case 'Animals':
-                                    $icon = 'fa-paw';
-                                    $bgColor = 'bg-orange-100';
-                                    $iconColor = 'text-orange-500';
-                                    break;
-                                case 'Health':
-                                    $icon = 'fa-heart-pulse';
-                                    $bgColor = 'bg-rose-100';
-                                    $iconColor = 'text-rose-500';
-                                    break;
-                                case 'Programming':
-                                    $icon = 'fa-code';
-                                    $bgColor = 'bg-indigo-100';
-                                    $iconColor = 'text-indigo-500';
-                                    break;
-                            }
-                        @endphp
-
-                        {{-- MODIFIED: Added flex layout and icon --}}
-                        <div class="flex items-start py-4 @if(!$loop->last) border-b border-gray-200 @endif">
-                            {{-- The badge icon div --}}
-                            <div class="flex-shrink-0 h-12 w-12 rounded-lg {{ $bgColor }} flex items-center justify-center">
-                                <i class="fas {{ $icon }} {{ $iconColor }} text-xl"></i>
-                            </div>
-                            {{-- The project details div --}}
-                            <div class="ml-4">
-                                <a href="#" class="text-sm font-semibold text-blue-600 hover:underline">{{ $savedProject->title }}</a>
-                                <p class="text-xs text-gray-600 mt-1">
-                                    Posted by
-                                    <a href="{{ route('profile.show', $savedProject->user) }}" class="font-medium text-gray-800 hover:underline">
-                                        {{ $savedProject->organization_name ?? $savedProject->user->name }}
-                                    </a>
-                                </p>
-                                <p class="text-xs text-gray-500">Saved {{ $savedProject->pivot->created_at->diffForHumans() }}</p>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-sm text-gray-500">You haven't saved any projects yet.</p>
-                    @endforelse
+                <div id="saved-projects-panel">
+                    @include('discovery.partials.saved-projects', ['savedProjectsForSidebar' => $savedProjectsForSidebar])
                 </div>
             </div>
             </div>
@@ -408,12 +349,84 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const projectIds = Array.from(document.querySelectorAll('.save-btn')).map(button => button.dataset.projectId);
+
+        function renderApplyState(projectId, projectState) {
+            const container = document.querySelector(`.project-apply-state[data-project-id="${projectId}"]`);
+
+            if (!container) {
+                return;
+            }
+
+            if (projectState.is_owner) {
+                container.innerHTML = '<button class="px-4 py-1 bg-gray-300 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled>Manage Your Project</button>';
+                return;
+            }
+
+            if (projectState.has_applied) {
+                container.innerHTML = '<button class="px-4 py-1 bg-gray-400 text-white rounded-md text-sm font-medium cursor-not-allowed" disabled><i class="fas fa-check mr-1"></i> Applied</button>';
+            }
+        }
+
+        function updateSaveButton(button, isSaved) {
+            const icon = button.querySelector('i');
+            const textSpan = button.querySelector('.btn-text');
+
+            textSpan.textContent = isSaved ? 'Saved' : 'Save';
+            button.classList.toggle('bg-sky-100', isSaved);
+            button.classList.toggle('text-sky-700', isSaved);
+            button.classList.toggle('border-sky-200', isSaved);
+            button.classList.toggle('bg-white', !isSaved);
+            button.classList.toggle('text-gray-700', !isSaved);
+            button.classList.toggle('border-gray-300', !isSaved);
+            icon.classList.toggle('fas', isSaved);
+            icon.classList.toggle('far', !isSaved);
+        }
+
+        async function refreshDiscoveryLiveData() {
+            if (projectIds.length === 0) {
+                return;
+            }
+
+            const [statsResponse, sidebarResponse] = await Promise.all([
+                fetch('{{ route('projects.stats') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ project_ids: projectIds })
+                }),
+                fetch('{{ route('discover.live') }}', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+            ]);
+
+            if (statsResponse.ok) {
+                const statsData = await statsResponse.json();
+
+                Object.entries(statsData.projects).forEach(([projectId, projectState]) => {
+                    const button = document.querySelector(`.save-btn[data-project-id="${projectId}"]`);
+                    if (button) {
+                        updateSaveButton(button, projectState.is_saved);
+                    }
+
+                    renderApplyState(projectId, projectState);
+                });
+            }
+
+            if (sidebarResponse.ok) {
+                const sidebarData = await sidebarResponse.json();
+                document.getElementById('saved-projects-panel').innerHTML = sidebarData.saved_projects_html;
+            }
+        }
 
         document.querySelectorAll('.save-btn').forEach(button => {
             button.addEventListener('click', async function () {
                 const projectId = this.dataset.projectId;
-                const icon = this.querySelector('i');
-                const textSpan = this.querySelector('.btn-text');
 
                 const response = await fetch(`/projects/${projectId}/save`, {
                     method: 'POST',
@@ -424,20 +437,17 @@
                 });
                 const data = await response.json();
 
-                // Update button text and style
-                textSpan.textContent = data.is_saved ? 'Saved' : 'Save';
-                this.classList.toggle('bg-sky-100', data.is_saved);
-                this.classList.toggle('text-sky-700', data.is_saved);
-                this.classList.toggle('border-sky-200', data.is_saved);
-                this.classList.toggle('bg-white', !data.is_saved);
-                this.classList.toggle('text-gray-700', !data.is_saved);
-                this.classList.toggle('border-gray-300', !data.is_saved);
-
-                // Update icon style (solid vs regular)
-                icon.classList.toggle('fas', data.is_saved); // solid icon
-                icon.classList.toggle('far', !data.is_saved); // regular icon
+                updateSaveButton(this, data.is_saved);
             });
         });
+
+        setInterval(async () => {
+            try {
+                await refreshDiscoveryLiveData();
+            } catch (error) {
+                console.error('Live discovery refresh failed.', error);
+            }
+        }, 15000);
     });
     </script>
     @endpush
