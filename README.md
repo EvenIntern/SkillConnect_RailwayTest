@@ -8,7 +8,7 @@
   <p align="center">
     <img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel">
     <img src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php" alt="PHP">
-    <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
     <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
   </p>
 </div>
@@ -37,10 +37,10 @@ This platform allows users to:
 ### ✅ Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
-- **PHP** (version 8.1 or higher)
+- **PHP** (version 8.2 or higher) with `pdo_pgsql` enabled
 - **Composer**
 - **Node.js & npm**
-- **Database Server** **(Use XAMPP Control Panel, enable Apache & MySQL)**
+- **PostgreSQL** (local development) or a managed Postgres instance
 
 
 Follow these steps carefully to get your development environment up and running.
@@ -79,31 +79,16 @@ Follow these steps carefully to get your development environment up and running.
 
 **6. Configure Your Database**
 
-**a. Start XAMPP Services**
+Create a Postgres database named `skillconnect`, then update `.env`:
 
-- Open the XAMPP Control Panel.
-- Click the `Start` button next to both the **Apache** and **MySQL** modules. They should both turn green.
-
-**b. Create the Database**
-
-- In the XAMPP Control Panel, click the `Admin` button for the **MySQL** module. This will open phpMyAdmin in your browser.
-- Click on the **Databases** tab at the top.
-- Under the "Create database" section, enter `skillconnect` in the text field and click `Create`.
-
-**c. Configure the .env File**
-
-- Open the `.env` file in your code editor.
-- Update the database credentials to match your XAMPP setup. The default username is `root` with no password.
-  
-   Open the `.env` file in your code editor and update the database credentials (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) to match your local setup.
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=skillconnect
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=skillconnect
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+```
 
 **7. Run Database Migrations**
    Create all the necessary tables in your database.
@@ -111,18 +96,50 @@ Follow these steps carefully to get your development environment up and running.
    php artisan migrate
    ```
 
-**8. Build Frontend Assets**
+**8. Create The Public Storage Symlink**
+   User avatars and banners are served from the configured filesystem disk.
+   ```bash
+   php artisan storage:link
+   ```
+
+**9. Build Frontend Assets**
    For local development, use `npm run dev` to compile assets and watch for changes.
    ```bash
    npm run dev
    ```
 
-**9. Run the Development Server**
+**10. Run the Development Server**
    Start the Laravel development server.
    ```bash
    php artisan serve
    ```
 
-**10. Access the Application**
+**11. Access the Application**
     You're all set! Open your web browser and go to the URL provided, usually:
     [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+---
+
+### Production Direction
+
+The near-term production target is a **Railway monolith deployment** backed by **Railway Postgres**. After launch, the intended split is:
+
+- frontend on Vercel
+- backend/API on Railway
+- database on Railway Postgres
+
+#### Railway Monolith Checklist
+
+1. Provision a Railway Postgres service.
+2. Set `DB_CONNECTION=pgsql`.
+3. Set either `DATABASE_URL` or `DB_URL` from Railway's Postgres connection string.
+4. Set `APP_ENV=production` and `APP_DEBUG=false`.
+5. Run `php artisan migrate --force` during deployment.
+6. Build frontend assets with `npm run build`.
+7. Expose the Laravel health endpoint at `/up`.
+
+#### Media Storage Best Practice
+
+For the first Railway monolith deployment, you can run on the `public` disk and attach a persistent volume to `storage/app/public`.
+
+For a production-grade multi-service architecture, switch `FILESYSTEM_DISK` to `s3` (or another S3-compatible object store) before scaling horizontally. Object storage is the ethical and operationally safe default for user-uploaded media because it avoids accidental data loss on redeploy or node replacement.

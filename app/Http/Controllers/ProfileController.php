@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+    private function mediaDisk(): string
+    {
+        return config('filesystems.default');
+    }
 
     /**
      * Display the user's public profile.
@@ -86,19 +90,21 @@ class ProfileController extends Controller
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
         ]);
 
+        $mediaDisk = $this->mediaDisk();
+
         if ($request->hasFile('avatar')) {
             if ($user->avatar_path) {
-                Storage::disk('public')->delete($user->avatar_path);
+                Storage::disk($mediaDisk)->delete($user->avatar_path);
             }
-            $validatedData['avatar_path'] = $request->file('avatar')->store('avatars', 'public');
+            $validatedData['avatar_path'] = $request->file('avatar')->store('avatars', $mediaDisk);
         }
 
 
         if ($request->hasFile('banner')) {
             if ($user->banner_path) {
-                Storage::disk('public')->delete($user->banner_path);
+                Storage::disk($mediaDisk)->delete($user->banner_path);
             }
-            $validatedData['banner_path'] = $request->file('banner')->store('banners', 'public');
+            $validatedData['banner_path'] = $request->file('banner')->store('banners', $mediaDisk);
         }
 
         $emailChanged = array_key_exists('email', $validatedData) && $validatedData['email'] !== $user->email;

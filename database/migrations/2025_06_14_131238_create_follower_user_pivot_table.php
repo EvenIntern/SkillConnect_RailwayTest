@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('follower_user_pivot');
+        Schema::dropIfExists('follower_user');
     }
 };
