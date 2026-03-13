@@ -18,7 +18,7 @@ class ProfileController extends Controller
 {
     private function mediaDisk(): string
     {
-        return config('filesystems.default');
+        return config('filesystems.media_disk', config('filesystems.default'));
     }
 
     /**

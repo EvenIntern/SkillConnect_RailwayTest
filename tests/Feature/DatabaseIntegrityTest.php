@@ -32,9 +32,13 @@ test('duplicate applications are blocked at the database layer', function () {
     ]))->toThrow(QueryException::class);
 });
 
-test('profile media uses the configured filesystem disk', function () {
+test('profile media uses the dedicated media disk instead of the app default disk', function () {
+    Storage::fake('public');
     Storage::fake('s3');
-    config(['filesystems.default' => 's3']);
+    config([
+        'filesystems.default' => 'public',
+        'filesystems.media_disk' => 's3',
+    ]);
 
     $user = User::factory()->create([
         'first_name' => 'Jane',
@@ -57,4 +61,5 @@ test('profile media uses the configured filesystem disk', function () {
 
     expect($user->avatar_path)->not->toBeNull();
     Storage::disk('s3')->assertExists($user->avatar_path);
+    Storage::disk('public')->assertMissing($user->avatar_path);
 });

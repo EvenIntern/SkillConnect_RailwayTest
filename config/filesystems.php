@@ -17,6 +17,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Media Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | Profile avatars and banners need persistent storage in production. When
+    | S3-compatible credentials are available, prefer that disk automatically
+    | unless MEDIA_DISK is explicitly overridden.
+    |
+    */
+
+    'media_disk' => env(
+        'MEDIA_DISK',
+        env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && env('AWS_BUCKET')
+            ? 's3'
+            : env('FILESYSTEM_DISK', 'public')
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |

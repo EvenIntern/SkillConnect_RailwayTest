@@ -12,7 +12,7 @@ class MediaController extends Controller
             abort(404);
         }
 
-        $disk = config('filesystems.default');
+        $disk = config('filesystems.media_disk', config('filesystems.default'));
 
         if (! Storage::disk($disk)->exists($path)) {
             abort(404);

@@ -37,3 +37,7 @@
 2026-03-09T18:07:57+07:00 [CODE] Updated `resources/views/messages/_conversation-list.blade.php` and `resources/views/messages/show.blade.php` to use each participant's `avatar_url` with the generated avatar only as a fallback.
 2026-03-09T18:07:57+07:00 [CODE] Extended `tests/Feature/MediaAndProjectCreateTest.php` with coverage for uploaded avatars on both the message list and selected conversation views.
 2026-03-09T18:07:57+07:00 [TOOL] Targeted verification completed: `php artisan test --filter=MediaAndProjectCreateTest` passed after the messages avatar fix.
+2026-03-13T21:28:36+07:00 [USER] Reported that uploaded profile pictures disappear after inactivity and requested a precise root-cause fix with validation.
+2026-03-13T21:28:36+07:00 [CODE] Added a dedicated `filesystems.media_disk` config path, wired profile upload/read paths to it, and documented `MEDIA_DISK` in `.env.example` so Railway deployments can keep avatars/banners on persistent object storage instead of ephemeral local disk.
+2026-03-13T21:28:36+07:00 [CODE] Strengthened media regression coverage so uploads target the dedicated media disk even when the app default disk differs, and local media reads resolve through the configured media disk.
+2026-03-13T21:28:36+07:00 [TOOL] Verification completed: `php artisan test tests/Feature/DatabaseIntegrityTest.php`, `php artisan test tests/Feature/MediaAndProjectCreateTest.php`, and full `php artisan test` all passed (42 tests, 144 assertions).

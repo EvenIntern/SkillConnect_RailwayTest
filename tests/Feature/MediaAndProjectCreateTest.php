@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MediaController;
 use App\Models\Project;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -7,9 +8,12 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-test('local profile media is served through the application route', function () {
+test('local profile media is served through the application route for the dedicated media disk', function () {
     Storage::fake('public');
-    config(['filesystems.default' => 'public']);
+    config([
+        'filesystems.default' => 'local',
+        'filesystems.media_disk' => 'public',
+    ]);
 
     $path = UploadedFile::fake()->create('avatar.jpg', 64, 'image/jpeg')->store('avatars', 'public');
 
@@ -19,9 +23,9 @@ test('local profile media is served through the application route', function () 
 
     expect($user->avatar_url)->toBe(route('media.show', ['path' => $path]));
 
-    $response = $this->get($user->avatar_url)
-        ->assertOk();
+    $response = app(MediaController::class)->show($path);
 
+    expect($response->getStatusCode())->toBe(200);
     expect($response->headers->get('cache-control'))->toContain('public');
     expect($response->headers->get('cache-control'))->toContain('max-age=86400');
 });

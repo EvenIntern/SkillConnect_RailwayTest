@@ -76,7 +76,7 @@ class User extends Authenticatable // Or your base User class
             return null;
         }
 
-        $disk = config('filesystems.default');
+        $disk = config('filesystems.media_disk', config('filesystems.default'));
         $driver = config("filesystems.disks.{$disk}.driver");
 
         if ($driver === 'local') {
