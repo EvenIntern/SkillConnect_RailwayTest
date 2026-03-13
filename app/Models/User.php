@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 
 
 class User extends Authenticatable // Or your base User class
@@ -76,14 +75,7 @@ class User extends Authenticatable // Or your base User class
             return null;
         }
 
-        $disk = config('filesystems.media_disk', config('filesystems.default'));
-        $driver = config("filesystems.disks.{$disk}.driver");
-
-        if ($driver === 'local') {
-            return route('media.show', ['path' => $path]);
-        }
-
-        return Storage::disk($disk)->url($path);
+        return route('media.show', ['path' => $path]);
     }
     // If you are on an older Laravel version, the casts property might look like:
     // protected $casts = [

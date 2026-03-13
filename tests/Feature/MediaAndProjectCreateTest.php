@@ -30,6 +30,28 @@ test('local profile media is served through the application route for the dedica
     expect($response->headers->get('cache-control'))->toContain('max-age=86400');
 });
 
+test('s3-compatible profile media is also served through the application route', function () {
+    Storage::fake('s3');
+    config([
+        'filesystems.default' => 'public',
+        'filesystems.media_disk' => 's3',
+    ]);
+
+    $path = UploadedFile::fake()->create('avatar.jpg', 64, 'image/jpeg')->store('avatars', 's3');
+
+    $user = User::factory()->create([
+        'avatar_path' => $path,
+    ]);
+
+    expect($user->avatar_url)->toBe(route('media.show', ['path' => $path]));
+
+    $response = app(MediaController::class)->show($path);
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->headers->get('cache-control'))->toContain('public');
+    expect($response->headers->get('cache-control'))->toContain('max-age=86400');
+});
+
 test('project create page gracefully falls back to a full page request', function () {
     $user = User::factory()->create();
 

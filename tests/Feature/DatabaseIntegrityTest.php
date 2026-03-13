@@ -60,6 +60,7 @@ test('profile media uses the dedicated media disk instead of the app default dis
     $user->refresh();
 
     expect($user->avatar_path)->not->toBeNull();
+    expect($user->avatar_url)->toBe(route('media.show', ['path' => $user->avatar_path]));
     Storage::disk('s3')->assertExists($user->avatar_path);
     Storage::disk('public')->assertMissing($user->avatar_path);
 });
