@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Skill;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Validation\Rule;
-use Illuminate\View\View;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Throwable;
 
 
 class ProfileController extends Controller
@@ -19,6 +22,33 @@ class ProfileController extends Controller
     private function mediaDisk(): string
     {
         return config('filesystems.media_disk', config('filesystems.default'));
+    }
+
+    private function storeProfileMedia(UploadedFile $file, string $directory, string $field, ?string $existingPath = null): string
+    {
+        $mediaDisk = $this->mediaDisk();
+
+        try {
+            $storedPath = $file->store($directory, $mediaDisk);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            throw ValidationException::withMessages([
+                $field => 'We could not upload that file. Please verify the storage configuration and try again.',
+            ]);
+        }
+
+        if (! is_string($storedPath) || $storedPath === '') {
+            throw ValidationException::withMessages([
+                $field => 'We could not upload that file. Please verify the storage configuration and try again.',
+            ]);
+        }
+
+        if ($existingPath) {
+            Storage::disk($mediaDisk)->delete($existingPath);
+        }
+
+        return $storedPath;
     }
 
     /**
@@ -90,21 +120,23 @@ class ProfileController extends Controller
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
         ]);
 
-        $mediaDisk = $this->mediaDisk();
-
         if ($request->hasFile('avatar')) {
-            if ($user->avatar_path) {
-                Storage::disk($mediaDisk)->delete($user->avatar_path);
-            }
-            $validatedData['avatar_path'] = $request->file('avatar')->store('avatars', $mediaDisk);
+            $validatedData['avatar_path'] = $this->storeProfileMedia(
+                $request->file('avatar'),
+                'avatars',
+                'avatar',
+                $user->avatar_path,
+            );
         }
 
 
         if ($request->hasFile('banner')) {
-            if ($user->banner_path) {
-                Storage::disk($mediaDisk)->delete($user->banner_path);
-            }
-            $validatedData['banner_path'] = $request->file('banner')->store('banners', $mediaDisk);
+            $validatedData['banner_path'] = $this->storeProfileMedia(
+                $request->file('banner'),
+                'banners',
+                'banner',
+                $user->banner_path,
+            );
         }
 
         $emailChanged = array_key_exists('email', $validatedData) && $validatedData['email'] !== $user->email;

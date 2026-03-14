@@ -1,5 +1,13 @@
 <?php
 
+$mediaBucket = env('AWS_BUCKET', env('AWS_S3_BUCKET_NAME'));
+$mediaEndpoint = env('AWS_ENDPOINT', env('AWS_ENDPOINT_URL'));
+$mediaUrlStyle = env('AWS_S3_URL_STYLE');
+$usePathStyleEndpoint = env(
+    'AWS_USE_PATH_STYLE_ENDPOINT',
+    $mediaUrlStyle ? $mediaUrlStyle === 'path' : false
+);
+
 return [
 
     /*
@@ -28,7 +36,7 @@ return [
 
     'media_disk' => env(
         'MEDIA_DISK',
-        env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && env('AWS_BUCKET')
+        env('AWS_ACCESS_KEY_ID') && env('AWS_SECRET_ACCESS_KEY') && $mediaBucket
             ? 's3'
             : env('FILESYSTEM_DISK', 'public')
     ),
@@ -70,10 +78,10 @@ return [
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
+            'bucket' => $mediaBucket,
             'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'endpoint' => $mediaEndpoint,
+            'use_path_style_endpoint' => $usePathStyleEndpoint,
             'throw' => false,
             'report' => false,
         ],

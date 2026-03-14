@@ -45,3 +45,7 @@
 2026-03-14T01:08:30+07:00 [CODE] Updated `App\Models\User::mediaUrl()` so avatars and banners always resolve through `route('media.show')`, allowing private S3-compatible/Railway-backed object storage to work without public bucket URLs.
 2026-03-14T01:08:30+07:00 [CODE] Expanded media regression coverage to assert the dedicated media disk still stores uploads correctly and that S3-compatible media can be served through the application route.
 2026-03-14T01:08:30+07:00 [TOOL] Verification completed: `php artisan test tests/Feature/DatabaseIntegrityTest.php`, `php artisan test tests/Feature/MediaAndProjectCreateTest.php`, and full `php artisan test` all passed (43 tests, 149 assertions).
+2026-03-14T01:25:24+07:00 [USER] Reported a 500 error when saving profile picture and banner uploads after configuring S3-compatible storage.
+2026-03-14T01:25:24+07:00 [CODE] Updated filesystem config to accept provider-specific S3 env aliases (`AWS_S3_BUCKET_NAME`, `AWS_ENDPOINT_URL`, `AWS_S3_URL_STYLE`) in addition to Laravel's standard `AWS_*` names, and documented the aliases in `.env.example`.
+2026-03-14T01:25:24+07:00 [CODE] Hardened `ProfileController::update()` so new media is stored before old media is deleted and storage write failures now become validation errors instead of 500 responses.
+2026-03-14T01:25:24+07:00 [TOOL] Verification completed: `php artisan test tests/Feature/DatabaseIntegrityTest.php`, `php artisan test tests/Feature/ProfileTest.php`, and full `php artisan test` all passed (45 tests, 159 assertions).
